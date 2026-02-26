@@ -1,0 +1,264 @@
+<!-- ================================================================
+  🐾 動物病院AIアシスタント 埋め込みテンプレート v1.0
+  
+  【使い方】
+  1. 下の「SETTINGS」セクション（4項目）を病院ごとに書き換える
+  2. このコード全体を、顧客サイトの </body> 直前に貼り付ける
+  3. 動作確認して完了
+  
+  ※ SETTINGS以外のコードは編集不要です
+================================================================ -->
+
+<!-- ━━━━━━ STEP 1: SETTINGS（病院ごとに書き換え）━━━━━━ -->
+<script>
+var VET_CHAT_CONFIG = {
+
+  // (1) Difyトークン【必須】
+  //     Difyアプリの公開設定から取得したトークンを貼り付け
+  token: 'ここにトークンを貼り付け',
+
+  // (2) アイコン画像URL【任意】
+  //     空欄 '' のままだとデフォルトの肉球アイコンが表示されます
+  //     病院オリジナルのアイコンを使う場合はURLを指定
+  //     例: 'https://あなたのユーザー名.github.io/vet-assets/icons/病院名.png'
+  iconUrl: '',
+
+  // (3) テーマカラー【任意】
+  //     病院のブランドカラーを指定（バブルボタンの背景色になります）
+  //     例: '#4CAF50'（緑）, '#2196F3'（青）, '#FF9800'（オレンジ）
+  themeColor: '#4CAF50',
+
+  // (4) ボタン位置【任意】
+  //     'right' = 画面右下（デフォルト）
+  //     'left'  = 画面左下
+  position: 'right',
+
+};
+</script>
+<!-- ━━━━━━ SETTINGS ここまで ━━━━━━ -->
+
+
+<!-- ━━━━━━ 以下は編集不要 ━━━━━━ -->
+
+<!-- STEP 2: Dify embed.js の読み込み -->
+<script>
+window.difyChatbotConfig = { token: VET_CHAT_CONFIG.token };
+</script>
+<script src="https://udify.app/embed.min.js" id="vet-ai-embed" defer></script>
+
+<!-- STEP 3: スタイル（全病院共通） -->
+<style>
+/* ─── CSS変数（デフォルト値） ─── */
+:root {
+  --vet-theme: #4CAF50;
+  --vet-btn-size: 64px;
+  --vet-btn-bottom: 20px;
+  --vet-btn-side: 20px;
+}
+
+/* ─── バブルボタン ─── */
+#dify-chatbot-bubble-button {
+  position: fixed !important;
+  bottom: var(--vet-btn-bottom) !important;
+  right: var(--vet-btn-side) !important;
+  left: unset !important;
+  width: var(--vet-btn-size) !important;
+  height: var(--vet-btn-size) !important;
+  padding: 0 !important;
+  background-color: var(--vet-theme) !important;
+  background-image: none !important;
+  background-size: 60% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: none !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18) !important;
+  cursor: pointer !important;
+  z-index: 9999 !important;
+  animation: vet-bounce 0.5s ease 3;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  overflow: hidden !important;
+}
+
+#dify-chatbot-bubble-button:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25) !important;
+}
+
+/* Difyデフォルトのアイコンを非表示にする */
+#dify-chatbot-bubble-button > * {
+  display: none !important;
+}
+
+/* デフォルト肉球アイコン（SVGインライン） */
+#dify-chatbot-bubble-button::after {
+  content: '' !important;
+  display: block !important;
+  width: 55% !important;
+  height: 55% !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJ3aGl0ZSI+CiAgPCEtLSDjg6HjgqTjg7Pjg5Hjg4Pjg4kgLS0+CiAgPGVsbGlwc2UgY3g9IjUwIiBjeT0iNjUiIHJ4PSIyMiIgcnk9IjE4Ii8+CiAgPCEtLSDlt6bkuIrjga7mjIfjg5Hjg4Pjg4kgLS0+CiAgPGVsbGlwc2UgY3g9IjI1IiBjeT0iMzgiIHJ4PSIxMCIgcnk9IjEyIiB0cmFuc2Zvcm09InJvdGF0ZSgtMTUgMjUgMzgpIi8+CiAgPCEtLSDlj7PkuIrjga7mjIfjg5Hjg4Pjg4kgLS0+CiAgPGVsbGlwc2UgY3g9Ijc1IiBjeT0iMzgiIHJ4PSIxMCIgcnk9IjEyIiB0cmFuc2Zvcm09InJvdGF0ZSgxNSA3NSAzOCkiLz4KICA8IS0tIOW3puOBruaMh+ODkeODg+ODiSAtLT4KICA8ZWxsaXBzZSBjeD0iMzMiIGN5PSIyOCIgcng9IjgiIHJ5PSIxMCIgdHJhbnNmb3JtPSJyb3RhdGUoLTUgMzMgMjgpIi8+CiAgPCEtLSDlj7Pjga7mjIfjg5Hjg4Pjg4kgLS0+CiAgPGVsbGlwc2UgY3g9IjY3IiBjeT0iMjgiIHJ4PSI4IiByeT0iMTAiIHRyYW5zZm9ybT0icm90YXRlKDUgNjcgMjgpIi8+Cjwvc3ZnPgo=") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
+
+/* 初回バウンスアニメーション（3回で停止） */
+@keyframes vet-bounce {
+  0%, 100% { transform: scale(1); }
+  40%      { transform: scale(1.15); }
+  60%      { transform: scale(0.95); }
+}
+
+/* ─── チャットウィンドウ ─── */
+#dify-chatbot-bubble-window {
+  position: fixed !important;
+  bottom: calc(var(--vet-btn-bottom) + var(--vet-btn-size) + 14px) !important;
+  right: var(--vet-btn-side) !important;
+  left: unset !important;
+  top: auto !important;
+  width: min(24rem, calc(100vw - 40px)) !important;
+  height: min(38rem, calc(100vh - 140px)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15) !important;
+  z-index: 9999 !important;
+}
+
+/* ─── タブレット（768px以下） ─── */
+@media (max-width: 768px) {
+  :root {
+    --vet-btn-size: 56px;
+  }
+  #dify-chatbot-bubble-window {
+    width: min(22rem, calc(100vw - 32px)) !important;
+    height: min(34rem, calc(100vh - 120px)) !important;
+  }
+}
+
+/* ─── スマホ（480px以下） ─── */
+@media (max-width: 480px) {
+  :root {
+    --vet-btn-size: 52px;
+    --vet-btn-bottom: 16px;
+    --vet-btn-side: 16px;
+  }
+  #dify-chatbot-bubble-button {
+    animation: none !important;
+  }
+  #dify-chatbot-bubble-window {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+}
+</style>
+
+<!-- STEP 4: ボタン制御スクリプト（全病院共通） -->
+<script>
+(function() {
+  // ボタンが生成されるのを監視して、設定を適用する
+  var cfg = window.VET_CHAT_CONFIG || {};
+  var applied = false;
+
+  function applyConfig(btn) {
+    if (applied) return;
+    applied = true;
+
+    // テーマカラーを適用
+    if (cfg.themeColor) {
+      document.documentElement.style.setProperty('--vet-theme', cfg.themeColor);
+    }
+
+    // 左配置の場合
+    if (cfg.position === 'left') {
+      btn.style.setProperty('right', 'unset', 'important');
+      btn.style.setProperty('left', 'var(--vet-btn-side)', 'important');
+      var win = document.getElementById('dify-chatbot-bubble-window');
+      if (win) {
+        win.style.setProperty('right', 'unset', 'important');
+        win.style.setProperty('left', 'var(--vet-btn-side)', 'important');
+      }
+      // ウィンドウは後から生成されるのでMutationObserverで追跡
+      var winObserver = new MutationObserver(function() {
+        var w = document.getElementById('dify-chatbot-bubble-window');
+        if (w) {
+          w.style.setProperty('right', 'unset', 'important');
+          w.style.setProperty('left', 'var(--vet-btn-side)', 'important');
+          winObserver.disconnect();
+        }
+      });
+      winObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // カスタムアイコン画像を適用
+    if (cfg.iconUrl && cfg.iconUrl !== '') {
+      var img = new Image();
+      img.onload = function() {
+        // カスタム画像が読めたら背景画像として設定
+        btn.style.setProperty('background-image', "url('" + cfg.iconUrl + "')", 'important');
+        btn.style.setProperty('background-size', 'cover', 'important');
+        btn.style.setProperty('border-radius', '16px', 'important');
+        // ::afterのデフォルトアイコンを非表示にするクラスを追加
+        btn.classList.add('vet-custom-icon');
+      };
+      img.onerror = function() {
+        // 読み込み失敗 → デフォルト肉球アイコンのまま（フォールバック）
+        console.warn('[VetChat] アイコン画像の読み込みに失敗しました。デフォルトアイコンを使用します。');
+      };
+      img.src = cfg.iconUrl;
+    }
+
+    // アクセシビリティ属性を追加
+    btn.setAttribute('aria-label', 'AIチャットで質問する');
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('tabindex', '0');
+    btn.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  }
+
+  // Difyがボタンを生成するのを待つ
+  var observer = new MutationObserver(function() {
+    var btn = document.getElementById('dify-chatbot-bubble-button');
+    if (btn) {
+      applyConfig(btn);
+      observer.disconnect();
+    }
+  });
+
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  }
+
+  // 10秒でタイムアウト（無限監視を防止）
+  setTimeout(function() { observer.disconnect(); }, 10000);
+})();
+</script>
+
+<!-- カスタムアイコン使用時にデフォルトアイコンを消すCSS -->
+<style>
+#dify-chatbot-bubble-button.vet-custom-icon::after {
+  display: none !important;
+}
+</style>
+
+<!-- ━━━━━━ 埋め込みコード ここまで ━━━━━━ -->
